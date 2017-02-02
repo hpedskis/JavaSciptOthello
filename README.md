@@ -1,2 +1,3 @@
 # hbp243-homework01
-homework01 created for hbp243
+Homework 1: reversi
+created for Hannah Pedersen (hbp243)
