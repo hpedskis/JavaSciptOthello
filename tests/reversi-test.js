@@ -34,7 +34,7 @@ describe('reversi', function() {
             expect(j).to.equal(2);
         });
     });
-
+/*/
     describe('indexToRowCol', function() {
         it('translates an index to a row and col (as an object)', function() {
             const board = rev.generateBoard(3, 3, " ");
@@ -328,5 +328,6 @@ describe('reversi', function() {
             expect(rev.isValidMoveAlgebraicNotation(board, 'X', 'D5')).to.be.false;
         });
     });
+    /*/
 
 });
