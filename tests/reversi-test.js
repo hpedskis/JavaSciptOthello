@@ -34,7 +34,7 @@ describe('reversi', function() {
             expect(j).to.equal(2);
         });
     });
-/*/
+
     describe('indexToRowCol', function() {
         it('translates an index to a row and col (as an object)', function() {
             const board = rev.generateBoard(3, 3, " ");
@@ -98,7 +98,7 @@ describe('reversi', function() {
             expect(board).to.deep.equal([" ", " ", " ", " ", " ", " ", " ", " ", " ", "X", " ", " ", " ", " ", " ", "X"]);
         });
     });
-
+    /*/
     describe('boardToString', function() {
         // TODO: change to regex to allow for flexible number of spaces
         it('formats a board', function() {

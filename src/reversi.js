@@ -36,17 +36,11 @@ function generateBoard(rows, columns) {
  However, our board implementation uses a one dimensional Array, so a cell must be specified by a single index.
  This function translates a row and a column into an index in the one dimensional Array representation of a Reversi board.
  */
-console.log(rowColToIndex(theBoard, 2, 3));
+console.log(rowColToIndex(theBoard, 2, 2));
 function rowColToIndex(board, rowNum, colNum){
     const numCols = Math.sqrt(board.length);
     //console.log(numCols);
-    var indexToReturn = 0;
-    for(var i=0; i< rowNum; i++){
-        indexToReturn+= numCols;
-    }
-    for(var j=0; j<colNum; j++){
-        indexToReturn++;
-    }
+    var indexToReturn = (numCols* rowNum + colNum);
     return indexToReturn;
 
 
@@ -59,27 +53,70 @@ function rowColToIndex(board, rowNum, colNum){
  The board supplied can be used to determine the max column and row numbers. You can assume that the board is
  always square. Row and column numbers start at 0.
  */
+
+
+
 function indexToRowCol(board, i){
-    /*/
-    var location{
-        row: 0;
-        col: 0;
-    }
-    /*/
+    var rowColObj = {
+        "row": 0,
+        "col": 0
+    };
+    var res = rowColObj;
+
+    const numCols = Math.sqrt(board.length);
+    res.row = Math.floor(i / numCols);
+    res.col = (i % numCols);
+
+    return res;
 
 }
 
 /*
  Sets the value of the cell at the specified row and column numbers on the board, board, to the value, letter.
  */
+
+
+
 function setBoardCell(board, letter, row, col){
+    var newBoard = board.slice(0, board.length);
+    const index = rowColToIndex(board, row, col);
+    newBoard[index] = letter;
+    return newBoard;
 
 }
 /*
  Translates algebraic notation specifying a cell into a row and column specifying the same cell.
  If the notation passed in is not valid, then return undefined.
  */
+
 function algebraicToRowCol(algebraicNotation){
+    if(algebraicNotation === undefined || algebraicNotation.length != 2){
+        return undefined;
+    }
+    const letters =['A','B','C','D','E','F','G','H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+        'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+    var rowColObj = {
+        "row": 0,
+        "col": 0
+    };
+    var res = rowColObj;
+
+    var indexInStr = 0;
+
+    var letterNumber = /^[0-9a-zA-Z]+$/;
+    if((!algebraicNotation.charAt(indexInStr).match(letterNumber)) || (!algebraicNotation.charAt(indexInStr + 1).match(letterNumber))){
+        return undefined;
+    }
+
+    const letterIndex = letters.indexOf(algebraicNotation.charAt(indexInStr));
+    if(letterIndex === -1) {
+        return undefined;
+    }
+    res.row = (algebraicNotation.charAt(indexInStr + 1) - 1);
+    res.col = letterIndex;
+
+    return res;
 
 }
 
@@ -87,13 +124,27 @@ function algebraicToRowCol(algebraicNotation){
  Translates algebraic notation specifying a cell into a row and column specifying the same cell.
  Use the setBoardCell function you created above to implement this
  */
+
 function placeLetter(board, letter, algebraicNotation){
+    var rowAndColObj = algebraicToRowCol(algebraicNotation);
+    board = setBoardCell(board, letter, rowAndColObj.row, rowAndColObj.col);
+    return board;
 
 }
 /*
 Same as placeLetter, but can accept multiple cells
  */
-function placeLetters(board, letter, algebraicNotation){
+placeLetters(theBoard, "X", "B1", "A2", "C2");
+function placeLetters(board, letter, ...letters) {
+    const algebraicPairs = letters;
+    console.log(algebraicPairs);
+
+    for(var i=0; i< algebraicPairs.length; i++){
+        board = placeLetter(board, letter, algebraicPairs[i]);
+        //console.log(board);
+    }
+    return board;
+
 
 }
 /*
@@ -167,6 +218,11 @@ function getValidMoves(board, letter){
 module.exports = {
     repeat: repeat,
     generateBoard: generateBoard,
-    rowColToIndex: rowColToIndex
+    rowColToIndex: rowColToIndex,
+    indexToRowCol: indexToRowCol,
+    setBoardCell: setBoardCell,
+    algebraicToRowCol: algebraicToRowCol,
+    placeLetter: placeLetter,
+    placeLetters: placeLetters
 
 }
