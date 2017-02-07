@@ -40,7 +40,7 @@ function generateBoard(rows, columns) {
 function rowColToIndex(board, rowNum, colNum){
     const numCols = Math.sqrt(board.length);
     //console.log(numCols);
-    let indexToReturn = (numCols* rowNum + colNum);
+    const indexToReturn = (numCols* rowNum + colNum);
 
     return indexToReturn;
 
@@ -58,11 +58,11 @@ function rowColToIndex(board, rowNum, colNum){
 
 
 function indexToRowCol(board, i){
-    let rowColObj = {
+    const rowColObj = {
         "row": 0,
         "col": 0
     };
-    let res = rowColObj;
+    const res = rowColObj;
 
     const numCols = Math.sqrt(board.length);
     res.row = Math.floor(i / numCols);
@@ -79,7 +79,7 @@ function indexToRowCol(board, i){
 
 
 function setBoardCell(board, letter, row, col){
-    let newBoard = board.slice(0, board.length);
+    const newBoard = board.slice(0, board.length);
     const index = rowColToIndex(board, row, col);
     newBoard[index] = letter;
     return newBoard;
@@ -92,22 +92,22 @@ function setBoardCell(board, letter, row, col){
 
 function algebraicToRowCol(algebraicNotation){
     console.log(algebraicNotation);
-    if(algebraicNotation === undefined || algebraicNotation.length != 2){
+    if(algebraicNotation === undefined || algebraicNotation.length !== 2){
         console.log("failing right away");
         return undefined;
     }
     const letters =['A','B','C','D','E','F','G','H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
         'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-    let rowColObj = {
+    const rowColObj = {
         "row": 0,
         "col": 0
     };
-    let res = rowColObj;
+    const res = rowColObj;
 
-    let indexInStr = 0;
+    const indexInStr = 0;
 
-    let letterNumber = /^[0-9a-zA-Z]+$/;
+    const letterNumber = /^[0-9a-zA-Z]+$/;
     if((!algebraicNotation.charAt(indexInStr).match(letterNumber)) || (!algebraicNotation.charAt(indexInStr + 1).match(letterNumber))){
         return undefined;
     }
@@ -129,7 +129,7 @@ function algebraicToRowCol(algebraicNotation){
  */
 
 function placeLetter(board, letter, algebraicNotation){
-    let rowAndColObj = algebraicToRowCol(algebraicNotation);
+    const rowAndColObj = algebraicToRowCol(algebraicNotation);
     board = setBoardCell(board, letter, rowAndColObj.row, rowAndColObj.col);
     return board;
 
@@ -153,6 +153,14 @@ function placeLetters(board, letter, ...letters) {
 /*
  Creates a text drawing representation of the Tic Tac Toe board passed in
  */
+function addDashedLines(boardString, width){
+    let newAddition = "  ";
+    for(let next = 0; next<width; next++){
+        newAddition += ("+---");
+    }
+    newAddition += "+\n";
+    return newAddition;
+}
 
 function boardToString(board){
     let boardString = "    ";
@@ -174,7 +182,7 @@ function boardToString(board){
         boardString += ((rowCount + 1) + " ");
         for (let colCount = 0; colCount < width; colCount++) {
             boardString += "| ";
-            if (elementAtIndex != " ") {
+            if (elementAtIndex !== " ") {
                 boardString += (elementAtIndex + " ");
             } else {
                 boardString += ("  ");
@@ -194,21 +202,14 @@ function boardToString(board){
 }
 
 
-function addDashedLines(boardString, width){
-    let newAddition = "  ";
-    for(let next = 0; next<width; next++){
-        newAddition += ("+---");
-    }
-    newAddition += "+\n";
-    return newAddition;
-}
+
 /*/
  Examines the board passed in to determine whether or not it's full.
  It returns true if there are no empty squares, false if there are still squares available
  */
 function isBoardFull(board){
    for(let i=0; i<board.length; i++){
-       if(board[i] == " "){
+       if(board[i] === " "){
            return false;
        }
    }
@@ -222,11 +223,11 @@ function isBoardFull(board){
  */
 
 function flip(board, row, col){
-    let index = rowColToIndex(board, row, col);
-    if(board[index] == " "){
+    const index = rowColToIndex(board, row, col);
+    if(board[index] === " "){
         return board; //no change
     }
-    else if (board[index] == "X"){
+    else if (board[index] === "X"){
         board[index] = "O";
     }else{
         board[index] = "X";
@@ -252,6 +253,16 @@ function flipCells(board, cellsToFlip){
     return board;
 
 }
+
+function isOnBoard(board, row, col){
+    const width = Math.sqrt(board.length);
+    if(row >= 0 && row <= width){
+        if(col>= 0 && col <=width){
+            return true;
+        }
+    }
+    return false;
+}
 /*/
  Using the board passed in determine which cells contain pieces to flip based on the last move.
  For example, if the last move was the X played at D3, then all of the O's on the board would be flipped (D2, B3 and C3.
@@ -264,30 +275,33 @@ console.log(boardToString(testBoard));
 console.log(getCellsToFlip(testBoard, 2, 3));
 
 function getCellsToFlip(board, rowStart, colStart){
-    let index = rowColToIndex(board, rowStart, colStart);
+
+    const index = rowColToIndex(board, rowStart, colStart);
     /*/ check validity
     if(board[index] != " "){
         return False;
     }
     /*/
-    var letter = board[index]; //piece should already be placed there
-    var opppoTile;
+
+    const letter = board[index]; //piece should already be placed there
+
+    let opppoTile;
     if(letter === "X"){
         opppoTile = "O";
     }else{
         opppoTile = "X";
     }
-    console.log("oppo tile is " + opppoTile);
 
-    var tilesToFlip = [];
+
+    const tilesToFlip = [];
     const searchHereForFlips = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]];
     for (let i = 0; i < searchHereForFlips.length; i++) {
-        var currRow = rowStart;
-        var currCol = colStart;
+        let currRow = rowStart;
+        let currCol = colStart;
 
         //TESTED: DEFINITLEY CORRECTLY PICKS UP ALL ELEMENTS OF SEARCHHEREFORFLIPS
-        var rowDirection = searchHereForFlips[i][0];
-        var colDirection = searchHereForFlips[i][1];
+        const rowDirection = searchHereForFlips[i][0];
+        const colDirection = searchHereForFlips[i][1];
 
 
         //take first steps in current coordinates directions
@@ -306,7 +320,7 @@ function getCellsToFlip(board, rowStart, colStart){
                 continue;
             }
             currIndex = rowColToIndex(board, currRow, currCol);
-            while(board[currIndex] == opppoTile){
+            while(board[currIndex] === opppoTile){
                 currRow += rowDirection;
                 currCol+= colDirection;
                 if(!isOnBoard(currRow, currCol)){
@@ -317,7 +331,7 @@ function getCellsToFlip(board, rowStart, colStart){
                 continue;
             }
             currIndex = rowColToIndex(board, currRow, currCol);
-            if(board[currIndex] == letter){
+            if(board[currIndex] === letter){
                 while(true){
                     currRow -= rowDirection;
                     currCol-= colDirection;
@@ -330,7 +344,7 @@ function getCellsToFlip(board, rowStart, colStart){
 
 
         }
-        console.log("found row, col not on board or not opposite piece: " + currRow, currCol);
+        //console.log("found row, col not on board or not opposite piece: " + currRow, currCol);
     }
 
     return tilesToFlip;
@@ -338,7 +352,7 @@ function getCellsToFlip(board, rowStart, colStart){
 
 function fixGroupings(coordsToFlipArr){
     let foundSameRowGrouping = [];
-    let newArr = [];
+    const newArr = [];
     for(let i = 0; i< coordsToFlipArr.length - 1; i++){
         if(coordsToFlipArr[i][0] === coordsToFlipArr[(i+1)][0]){
             foundSameRowGrouping.push(coordsToFlipArr[i]);
@@ -360,29 +374,20 @@ function fixGroupings(coordsToFlipArr){
 
 
 
-
-
-function isOnBoard(board, row, col){
-    let width = Math.sqrt(board.length);
-    if(row >= 0 && row <= width){
-        if(col>= 0 && col <=width){
-            return true;
-        }
-    }
-    return false;
-}
-
-
 /*/
  Using the board passed in, determines whether or not a move with letter to row and col is valid. A valid move:
  -targets an empty square
  -is within the boundaries of the board
  -adheres to the rules of Reversi… that is, the piece played must flip at least one of the other player's pieces
  */
-console.log(isValidMove(testBoard, 'X', 2, 0));
+let board = generateBoard(3, 3, " ");
+board = placeLetter(board, 'X', "A1");
+board = placeLetter(board, 'O', "A2");
+console.log(boardToString(board));
+console.log(getCellsToFlip(board, 2, 0, 'X'));
+console.log(isValidMove(board, 'X', 2, 0));
 function isValidMove(board, letter, row, col){
-    console.log("inside isValidMove with row " + row + " and col " + col);
-    let boardIndex = rowColToIndex(board, row, col);
+    const boardIndex = rowColToIndex(board, row, col);
 
     if(board[boardIndex] === "O" || board[boardIndex] === "X"){ //must be blank space
         return false;
@@ -390,11 +395,14 @@ function isValidMove(board, letter, row, col){
     if(!isOnBoard(board, row, col)){
         return false;
     }
+    board[boardIndex] = letter;
+    //console.log("changed boardIndex in isValidMove to " + board[boardIndex]);
     const res = getCellsToFlip(board, row, col, letter);
-    if (res.isEmpty){
+    board[boardIndex] = " ";
+    //console.log(res);
+    if (res.length < 1){
         return false;
     }else{
-        console.log("returning true");
         return true;
     }
 
@@ -407,7 +415,7 @@ Use the functions you previously created, isValidMove and algebraicToRowCol to i
 //console.log(isValidMoveAlgebraicNotation(testBoard, 'X', "D2"));
 function isValidMoveAlgebraicNotation(board, letter, algebraicNotation){
     console.log(algebraicNotation);
-    let rowColObj = algebraicToRowCol(algebraicNotation);
+    const rowColObj = algebraicToRowCol(algebraicNotation);
     console.log(rowColObj.row + " " + rowColObj.col);
     return isValidMove(board, letter, rowColObj.row, rowColObj.col);
 
@@ -419,11 +427,11 @@ function isValidMoveAlgebraicNotation(board, letter, algebraicNotation){
  */
 //console.log(getLetterCounts(testBoard));
 function getLetterCounts(board){
-    let countObj = {
+    const countObj = {
         X: 0,
         O: 0
-    }
-    let res = countObj;
+    };
+    const res = countObj;
 
     for(let i=0; i< board.length; i++){
         if(board[i] === "X"){
@@ -440,7 +448,7 @@ function getLetterCounts(board){
  Gives back a list of valid moves that the letter can make on the board. These moves are returned as a list of
  row and column pairs - an Array containing 2-element Arrays
  */
-/*/
+
 let newB = generateBoard(4, 4, " ");
 newB = placeLetters(newB, 'X', 'A1');
 newB = placeLetters(newB, 'O', 'B2');
@@ -449,10 +457,11 @@ newB = placeLetters(newB, 'O', 'C3');
 console.log(boardToString(newB));
 const res = getValidMoves(newB, 'X');
 console.log(res);
-/*/
+
 function getValidMoves(board, letter){
-    var resArr = [];
+    const resArr = [];
     const boardWidth = Math.sqrt(board.length);
+
     for(let row=0; row< boardWidth; row++){
         for(let col =0; col< boardWidth; col++){
             if(isValidMove(board, letter, row, col)){
@@ -483,4 +492,4 @@ module.exports = {
     isValidMoveAlgebraicNotation: isValidMoveAlgebraicNotation,
     getLetterCounts: getLetterCounts
 
-}
+};
