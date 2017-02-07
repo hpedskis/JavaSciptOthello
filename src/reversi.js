@@ -7,7 +7,7 @@
  */
 function repeat(value, n){
     const arr = [];
-    for(var i=0; i<n; i++){
+    for(let i=0; i<n; i++){
         arr.push(value);
     }
     return arr;
@@ -19,11 +19,11 @@ function repeat(value, n){
  The initial value in each cell is the initialCellValue passed in
  */
 
-const theBoard = generateBoard(3,3);
-console.log(theBoard);
+
+//console.log(theBoard);
 function generateBoard(rows, columns) {
     const board = [];
-    for(var i=0; i< rows; i++){
+    for(let i=0; i< rows; i++){
         board.push.apply(board, repeat(" ", columns));
     }
 
@@ -36,11 +36,12 @@ function generateBoard(rows, columns) {
  However, our board implementation uses a one dimensional Array, so a cell must be specified by a single index.
  This function translates a row and a column into an index in the one dimensional Array representation of a Reversi board.
  */
-console.log(rowColToIndex(theBoard, 2, 2));
+
 function rowColToIndex(board, rowNum, colNum){
     const numCols = Math.sqrt(board.length);
     //console.log(numCols);
-    var indexToReturn = (numCols* rowNum + colNum);
+    let indexToReturn = (numCols* rowNum + colNum);
+
     return indexToReturn;
 
 
@@ -57,11 +58,11 @@ function rowColToIndex(board, rowNum, colNum){
 
 
 function indexToRowCol(board, i){
-    var rowColObj = {
+    let rowColObj = {
         "row": 0,
         "col": 0
     };
-    var res = rowColObj;
+    let res = rowColObj;
 
     const numCols = Math.sqrt(board.length);
     res.row = Math.floor(i / numCols);
@@ -78,7 +79,7 @@ function indexToRowCol(board, i){
 
 
 function setBoardCell(board, letter, row, col){
-    var newBoard = board.slice(0, board.length);
+    let newBoard = board.slice(0, board.length);
     const index = rowColToIndex(board, row, col);
     newBoard[index] = letter;
     return newBoard;
@@ -90,21 +91,23 @@ function setBoardCell(board, letter, row, col){
  */
 
 function algebraicToRowCol(algebraicNotation){
+    console.log(algebraicNotation);
     if(algebraicNotation === undefined || algebraicNotation.length != 2){
+        console.log("failing right away");
         return undefined;
     }
     const letters =['A','B','C','D','E','F','G','H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
         'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-    var rowColObj = {
+    let rowColObj = {
         "row": 0,
         "col": 0
     };
-    var res = rowColObj;
+    let res = rowColObj;
 
-    var indexInStr = 0;
+    let indexInStr = 0;
 
-    var letterNumber = /^[0-9a-zA-Z]+$/;
+    let letterNumber = /^[0-9a-zA-Z]+$/;
     if((!algebraicNotation.charAt(indexInStr).match(letterNumber)) || (!algebraicNotation.charAt(indexInStr + 1).match(letterNumber))){
         return undefined;
     }
@@ -126,7 +129,7 @@ function algebraicToRowCol(algebraicNotation){
  */
 
 function placeLetter(board, letter, algebraicNotation){
-    var rowAndColObj = algebraicToRowCol(algebraicNotation);
+    let rowAndColObj = algebraicToRowCol(algebraicNotation);
     board = setBoardCell(board, letter, rowAndColObj.row, rowAndColObj.col);
     return board;
 
@@ -134,12 +137,12 @@ function placeLetter(board, letter, algebraicNotation){
 /*
 Same as placeLetter, but can accept multiple cells
  */
-placeLetters(theBoard, "X", "B1", "A2", "C2");
+
 function placeLetters(board, letter, ...letters) {
     const algebraicPairs = letters;
     console.log(algebraicPairs);
 
-    for(var i=0; i< algebraicPairs.length; i++){
+    for(let i=0; i< algebraicPairs.length; i++){
         board = placeLetter(board, letter, algebraicPairs[i]);
         //console.log(board);
     }
@@ -150,14 +153,66 @@ function placeLetters(board, letter, ...letters) {
 /*
  Creates a text drawing representation of the Tic Tac Toe board passed in
  */
-function boardToString(board){
 
+function boardToString(board){
+    let boardString = "    ";
+    //first, print num letters
+    const letters =['A','B','C','D','E','F','G','H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+        'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+    const width = Math.sqrt(board.length);
+    for(let outside = 0; outside<width; outside++){
+        boardString += (letters[outside] + "   ");
+    }
+    boardString += ("\n");
+    boardString+= addDashedLines(boardString, width);
+
+    let indexInBoard = 0;
+    for(let rowCount = 0; rowCount < width; rowCount++) {
+        let elementAtIndex = board[indexInBoard];
+        //console.log("element at index " + indexInBoard + " is " + elementAtIndex);
+        boardString += ((rowCount + 1) + " ");
+        for (let colCount = 0; colCount < width; colCount++) {
+            boardString += "| ";
+            if (elementAtIndex != " ") {
+                boardString += (elementAtIndex + " ");
+            } else {
+                boardString += ("  ");
+            }
+            indexInBoard++;
+            elementAtIndex = board[indexInBoard];
+            //console.log("POST COL: index in board is now " + indexInBoard);
+
+        }
+        boardString+= "| \n";
+        boardString += addDashedLines(boardString, width);
+
+    }
+
+    return boardString;
+
+}
+
+
+function addDashedLines(boardString, width){
+    let newAddition = "  ";
+    for(let next = 0; next<width; next++){
+        newAddition += ("+---");
+    }
+    newAddition += "+\n";
+    return newAddition;
 }
 /*/
  Examines the board passed in to determine whether or not it's full.
  It returns true if there are no empty squares, false if there are still squares available
  */
 function isBoardFull(board){
+   for(let i=0; i<board.length; i++){
+       if(board[i] == " "){
+           return false;
+       }
+   }
+   return true;
 
 }
 
@@ -165,30 +220,154 @@ function isBoardFull(board){
  Using the board passed in, flip the piece at the specified row and col so that it is the opposite color
  by changing X to O or O to X. If no letter is present, do not change the contents of the cell.
  */
+
 function flip(board, row, col){
+    let index = rowColToIndex(board, row, col);
+    if(board[index] == " "){
+        return board; //no change
+    }
+    else if (board[index] == "X"){
+        board[index] = "O";
+    }else{
+        board[index] = "X";
+    }
+
+    return board;
 
 }
 
 /*
-
+    creates a board where board where the letters specified in cellsToFlipare changed to the opposite letter
+    - from X to O or O to X (that is, the pieces are changed to the opposite color)
  */
+
 function flipCells(board, cellsToFlip){
+
+    for(let i=0; i< cellsToFlip.length; i++){
+        for(let j=0; j<cellsToFlip[i].length;j++){
+            board = flip(board, cellsToFlip[i][j][0], cellsToFlip[i][j][1]);
+
+        }
+    }
+    return board;
 
 }
 /*/
  Using the board passed in determine which cells contain pieces to flip based on the last move.
  For example, if the last move was the X played at D3, then all of the O's on the board would be flipped (D2, B3 and C3.
  */
-function getCellsToFlip(board, lastRow, lastCol){
+
+let testBoard = generateBoard(4, 4, " ");
+testBoard = placeLetters(testBoard, 'O', 'B3', 'C3', 'D2');
+testBoard = placeLetters(testBoard, 'X', 'A3', 'D1', 'D3');
+console.log(boardToString(testBoard));
+console.log(getCellsToFlip(testBoard, 2, 0));
+
+//ADDED: option param for checking if there's a valid mood before placing piece
+function getCellsToFlip(board, lastRow, lastCol, letter){
+    let coordsToFlip = [];
+    const indexOfPiece = rowColToIndex(board, lastRow, lastCol);
+    //did we need to temporarially add a piece to the board to check for validity?
+    let addedPiece = false;
+    let originalPiece;
+    //if we're testing before adding piece...
+     if(board[indexOfPiece] === " "){
+         board[indexOfPiece] = letter;
+         addedPiece = true;
+
+     }
+    originalPiece = board[indexOfPiece];
+
+    let otherPiece;
+    if(originalPiece === "X"){
+        otherPiece = "O";
+    }else{
+        otherPiece = "X";
+    }
+
+    let boardCopy = board.slice(0, board.length);
+    boardCopy[indexOfPiece] = "O";
+    //put board back to normal, although changes will be in board copy (yay!)
+    if(addedPiece){
+        board[indexOfPiece] = " ";
+    }
+
+    rowColFlipper(boardCopy, lastRow, lastCol, originalPiece, otherPiece, coordsToFlip);
+    //remove the first element, which will always be us... {janky fix lol}
+    coordsToFlip = coordsToFlip.slice(1, coordsToFlip.length);
+
+    return coordsToFlip;
 
 }
+
+
+
+//recursive helper
+function rowColFlipper(board, row, col, originalPiece, otherPiece, foundFlip) {
+
+    const indexOfPiece = rowColToIndex(board, row, col);
+
+    const searchHereForFlips = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]];
+
+    if(!isOnBoard(board, row, col) || board[indexOfPiece] !=otherPiece){
+        return;
+    }
+    if (board[indexOfPiece] === otherPiece) {
+        let coords = [row, col];
+        foundFlip.push(coords);
+        board[indexOfPiece] = originalPiece; //make piece ours
+
+    }
+    for (let i = 0; i < searchHereForFlips.length; i++) {
+
+        let xdirection = searchHereForFlips[i][0];
+        let ydirection = searchHereForFlips[i][1];
+
+        let x = row;
+        let y = col;
+
+        x += xdirection;
+        y += ydirection;
+
+        let currIndex = rowColToIndex(board, x, y);
+        foundFlip.concat(rowColFlipper(board, x, y, originalPiece, otherPiece, foundFlip));
+
+    }
+    return;
+}
+
+function isOnBoard(board, row, col){
+    let width = Math.sqrt(board.length);
+    if(row >= 0 && row <= width){
+        if(col>= 0 && col <=width){
+            return true;
+        }
+    }
+    return false;
+}
+
+
 /*/
  Using the board passed in, determines whether or not a move with letter to row and col is valid. A valid move:
  -targets an empty square
  -is within the boundaries of the board
  -adheres to the rules of Reversi… that is, the piece played must flip at least one of the other player's pieces
  */
+console.log(isValidMove(testBoard, 'X', 1, 1));
 function isValidMove(board, letter, row, col){
+    let boardIndex = rowColToIndex(board, row, col);
+
+    if(board[boardIndex] != " "){
+        return false;
+    }
+    if(! isOnBoard(board, row, col)){
+        return false;
+    }
+    const res = getCellsToFlip(board, row, col, letter);
+    if (res.length < 1){
+        return false;
+    }
+    return true;
 
 }
 
@@ -196,7 +375,12 @@ function isValidMove(board, letter, row, col){
 Using the board passed in, determines whether or not a move with letter to algebraicNotation is valid.
 Use the functions you previously created, isValidMove and algebraicToRowCol to implement this function.
  */
+console.log(isValidMoveAlgebraicNotation(testBoard, 'X', "D2"));
 function isValidMoveAlgebraicNotation(board, letter, algebraicNotation){
+    console.log(algebraicNotation);
+    let rowColObj = algebraicToRowCol(algebraicNotation);
+    console.log(rowColObj.row + " " + rowColObj.col);
+    return isValidMove(board, letter, rowColObj.row, rowColObj.col);
 
 }
 /*/
@@ -223,6 +407,17 @@ module.exports = {
     setBoardCell: setBoardCell,
     algebraicToRowCol: algebraicToRowCol,
     placeLetter: placeLetter,
-    placeLetters: placeLetters
+    placeLetters: placeLetters,
+    isBoardFull: isBoardFull,
+    flip: flip,
+    flipCells: flipCells,
+    boardToString: boardToString,
+    addDashedLines: addDashedLines,
+    getCellsToFlip: getCellsToFlip,
+    rowColFlipper: rowColFlipper,
+    isOnBoard: isOnBoard,
+    isValidMove: isValidMove,
+    isValidMoveAlgebraicNotation: isValidMoveAlgebraicNotation
+
 
 }

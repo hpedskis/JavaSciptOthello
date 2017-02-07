@@ -98,7 +98,7 @@ describe('reversi', function() {
             expect(board).to.deep.equal([" ", " ", " ", " ", " ", " ", " ", " ", " ", "X", " ", " ", " ", " ", " ", "X"]);
         });
     });
-    /*/
+
     describe('boardToString', function() {
         // TODO: change to regex to allow for flexible number of spaces
         it('formats a board', function() {
@@ -109,6 +109,7 @@ describe('reversi', function() {
             expect(rev.boardToString(board)).to.equal(expected);
         });
     });
+
 
     describe('isBoardFull', function() {
         it('returns true if there are no spaces left on the board', function() {
@@ -310,7 +311,7 @@ describe('reversi', function() {
             });
         });
     });
-
+    /*/
     describe('getLetterCounts', function() {
         // TODO: zero letters
         it('returns object containing counts of letters', function() {
