@@ -219,7 +219,7 @@ describe('reversi', function() {
             expect(rev.isValidMoveAlgebraicNotation(board, 'X', 'A3')).to.be.false;
         });
     });
-
+/*/
     // TODO: more tests
     describe('getValidMoves', function() {
         it('returns list of valid moves available for board and letter', function() {
@@ -280,7 +280,7 @@ describe('reversi', function() {
             expect(res).to.deep.include.members([[3, 3], [1, 2]]);
         });
     });
-
+ /*/
     describe('getCellsToFlip', function() {
         // TODO: test diagonals, horizontal, vertical, more than one cell, etc.
         // TODO: the test for this should be flexible enough to handle different orderings
@@ -311,7 +311,7 @@ describe('reversi', function() {
             });
         });
     });
-    /*/
+
     describe('getLetterCounts', function() {
         // TODO: zero letters
         it('returns object containing counts of letters', function() {
@@ -329,6 +329,6 @@ describe('reversi', function() {
             expect(rev.isValidMoveAlgebraicNotation(board, 'X', 'D5')).to.be.false;
         });
     });
-    /*/
+
 
 });

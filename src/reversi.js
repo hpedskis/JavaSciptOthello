@@ -261,80 +261,106 @@ let testBoard = generateBoard(4, 4, " ");
 testBoard = placeLetters(testBoard, 'O', 'B3', 'C3', 'D2');
 testBoard = placeLetters(testBoard, 'X', 'A3', 'D1', 'D3');
 console.log(boardToString(testBoard));
-console.log(getCellsToFlip(testBoard, 2, 0));
+console.log(getCellsToFlip(testBoard, 2, 3));
 
-//ADDED: option param for checking if there's a valid mood before placing piece
-function getCellsToFlip(board, lastRow, lastCol, letter){
-    let coordsToFlip = [];
-    const indexOfPiece = rowColToIndex(board, lastRow, lastCol);
-    //did we need to temporarially add a piece to the board to check for validity?
-    let addedPiece = false;
-    let originalPiece;
-    //if we're testing before adding piece...
-     if(board[indexOfPiece] === " "){
-         board[indexOfPiece] = letter;
-         addedPiece = true;
-
-     }
-    originalPiece = board[indexOfPiece];
-
-    let otherPiece;
-    if(originalPiece === "X"){
-        otherPiece = "O";
+function getCellsToFlip(board, rowStart, colStart){
+    let index = rowColToIndex(board, rowStart, colStart);
+    /*/ check validity
+    if(board[index] != " "){
+        return False;
+    }
+    /*/
+    var letter = board[index]; //piece should already be placed there
+    var opppoTile;
+    if(letter === "X"){
+        opppoTile = "O";
     }else{
-        otherPiece = "X";
+        opppoTile = "X";
     }
+    console.log("oppo tile is " + opppoTile);
 
-    let boardCopy = board.slice(0, board.length);
-    boardCopy[indexOfPiece] = "O";
-    //put board back to normal, although changes will be in board copy (yay!)
-    if(addedPiece){
-        board[indexOfPiece] = " ";
-    }
-
-    rowColFlipper(boardCopy, lastRow, lastCol, originalPiece, otherPiece, coordsToFlip);
-    //remove the first element, which will always be us... {janky fix lol}
-    coordsToFlip = coordsToFlip.slice(1, coordsToFlip.length);
-
-    return coordsToFlip;
-
-}
-
-
-
-//recursive helper
-function rowColFlipper(board, row, col, originalPiece, otherPiece, foundFlip) {
-
-    const indexOfPiece = rowColToIndex(board, row, col);
-
+    var tilesToFlip = [];
     const searchHereForFlips = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]];
-
-    if(!isOnBoard(board, row, col) || board[indexOfPiece] !=otherPiece){
-        return;
-    }
-    if (board[indexOfPiece] === otherPiece) {
-        let coords = [row, col];
-        foundFlip.push(coords);
-        board[indexOfPiece] = originalPiece; //make piece ours
-
-    }
     for (let i = 0; i < searchHereForFlips.length; i++) {
+        var currRow = rowStart;
+        var currCol = colStart;
 
-        let xdirection = searchHereForFlips[i][0];
-        let ydirection = searchHereForFlips[i][1];
+        //TESTED: DEFINITLEY CORRECTLY PICKS UP ALL ELEMENTS OF SEARCHHEREFORFLIPS
+        var rowDirection = searchHereForFlips[i][0];
+        var colDirection = searchHereForFlips[i][1];
 
-        let x = row;
-        let y = col;
 
-        x += xdirection;
-        y += ydirection;
+        //take first steps in current coordinates directions
+        currRow += rowDirection;
+        currCol+= colDirection;
 
-        let currIndex = rowColToIndex(board, x, y);
-        foundFlip.concat(rowColFlipper(board, x, y, originalPiece, otherPiece, foundFlip));
+        let currIndex = rowColToIndex(board, currRow, currCol);
+
+        if(isOnBoard(board, currRow, currCol) && board[currIndex] === opppoTile){
+            //continue down this path
+            currRow += rowDirection;
+            currCol+= colDirection;
+
+            //unless we fall off board
+            if(!isOnBoard(board, currRow, currCol)){
+                continue;
+            }
+            currIndex = rowColToIndex(board, currRow, currCol);
+            while(board[currIndex] == opppoTile){
+                currRow += rowDirection;
+                currCol+= colDirection;
+                if(!isOnBoard(currRow, currCol)){
+                    break;
+                }
+            }
+            if(!isOnBoard(board, currRow, currCol)){
+                continue;
+            }
+            currIndex = rowColToIndex(board, currRow, currCol);
+            if(board[currIndex] == letter){
+                while(true){
+                    currRow -= rowDirection;
+                    currCol-= colDirection;
+                    if(currRow === rowStart && currCol === colStart){
+                        break;
+                    }
+                    tilesToFlip.push([currRow, currCol]);
+                }
+            }
+
+
+        }
+        console.log("found row, col not on board or not opposite piece: " + currRow, currCol);
+    }
+
+    return tilesToFlip;
+}
+
+function fixGroupings(coordsToFlipArr){
+    let foundSameRowGrouping = [];
+    let newArr = [];
+    for(let i = 0; i< coordsToFlipArr.length - 1; i++){
+        if(coordsToFlipArr[i][0] === coordsToFlipArr[(i+1)][0]){
+            foundSameRowGrouping.push(coordsToFlipArr[i]);
+            foundSameRowGrouping.push(coordsToFlipArr[i+1]);
+            newArr.push(foundSameRowGrouping);
+            foundSameRowGrouping = [];
+            i++;
+
+
+        }else{
+            newArr.push(coordsToFlipArr[i]);
+        }
 
     }
-    return;
+    newArr.push(coordsToFlipArr[coordsToFlipArr.length -1]);
+
+    return newArr;
 }
+
+
+
+
 
 function isOnBoard(board, row, col){
     let width = Math.sqrt(board.length);
@@ -353,21 +379,24 @@ function isOnBoard(board, row, col){
  -is within the boundaries of the board
  -adheres to the rules of Reversi… that is, the piece played must flip at least one of the other player's pieces
  */
-console.log(isValidMove(testBoard, 'X', 1, 1));
+console.log(isValidMove(testBoard, 'X', 2, 0));
 function isValidMove(board, letter, row, col){
+    console.log("inside isValidMove with row " + row + " and col " + col);
     let boardIndex = rowColToIndex(board, row, col);
 
-    if(board[boardIndex] != " "){
+    if(board[boardIndex] === "O" || board[boardIndex] === "X"){ //must be blank space
         return false;
     }
-    if(! isOnBoard(board, row, col)){
+    if(!isOnBoard(board, row, col)){
         return false;
     }
     const res = getCellsToFlip(board, row, col, letter);
-    if (res.length < 1){
+    if (res.isEmpty){
         return false;
+    }else{
+        console.log("returning true");
+        return true;
     }
-    return true;
 
 }
 
@@ -375,7 +404,7 @@ function isValidMove(board, letter, row, col){
 Using the board passed in, determines whether or not a move with letter to algebraicNotation is valid.
 Use the functions you previously created, isValidMove and algebraicToRowCol to implement this function.
  */
-console.log(isValidMoveAlgebraicNotation(testBoard, 'X', "D2"));
+//console.log(isValidMoveAlgebraicNotation(testBoard, 'X', "D2"));
 function isValidMoveAlgebraicNotation(board, letter, algebraicNotation){
     console.log(algebraicNotation);
     let rowColObj = algebraicToRowCol(algebraicNotation);
@@ -388,14 +417,50 @@ function isValidMoveAlgebraicNotation(board, letter, algebraicNotation){
  the value and the letter is the property name. For example, if the board has 2 X's and 1 O, then the object return
  would be: { X: 2, O: 1 }
  */
+//console.log(getLetterCounts(testBoard));
 function getLetterCounts(board){
+    let countObj = {
+        X: 0,
+        O: 0
+    }
+    let res = countObj;
+
+    for(let i=0; i< board.length; i++){
+        if(board[i] === "X"){
+            countObj.X++;
+        }else if(board[i] === "O"){
+            countObj.O++;
+        }
+    }
+    return res;
+
 
 }
 /*/
  Gives back a list of valid moves that the letter can make on the board. These moves are returned as a list of
  row and column pairs - an Array containing 2-element Arrays
  */
+/*/
+let newB = generateBoard(4, 4, " ");
+newB = placeLetters(newB, 'X', 'A1');
+newB = placeLetters(newB, 'O', 'B2');
+newB = placeLetters(newB, 'X', 'A2');
+newB = placeLetters(newB, 'O', 'C3');
+console.log(boardToString(newB));
+const res = getValidMoves(newB, 'X');
+console.log(res);
+/*/
 function getValidMoves(board, letter){
+    var resArr = [];
+    const boardWidth = Math.sqrt(board.length);
+    for(let row=0; row< boardWidth; row++){
+        for(let col =0; col< boardWidth; col++){
+            if(isValidMove(board, letter, row, col)){
+                resArr.push([row, col]);
+            }
+        }
+    }
+    return resArr;
 
 }
 
@@ -414,10 +479,8 @@ module.exports = {
     boardToString: boardToString,
     addDashedLines: addDashedLines,
     getCellsToFlip: getCellsToFlip,
-    rowColFlipper: rowColFlipper,
-    isOnBoard: isOnBoard,
     isValidMove: isValidMove,
-    isValidMoveAlgebraicNotation: isValidMoveAlgebraicNotation
-
+    isValidMoveAlgebraicNotation: isValidMoveAlgebraicNotation,
+    getLetterCounts: getLetterCounts
 
 }
