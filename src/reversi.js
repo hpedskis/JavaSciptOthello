@@ -250,12 +250,11 @@ function flip(board, row, col){
  */
 
 function flipCells(board, cellsToFlip){
-
     for(let i=0; i< cellsToFlip.length; i++){
-        for(let j=0; j<cellsToFlip[i].length;j++){
-            board = flip(board, cellsToFlip[i][j][0], cellsToFlip[i][j][1]);
+            console.log("trying to flip " + cellsToFlip[i][0] + " and " + cellsToFlip[i][1]);
+            board = flip(board, cellsToFlip[i][0], cellsToFlip[i][1]);
 
-        }
+
     }
     return board;
 

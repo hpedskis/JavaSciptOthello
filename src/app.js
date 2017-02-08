@@ -91,47 +91,79 @@ function setUpCustomBoard(playerLetter){
 
 }
 function playGame(board, playerLetter, opponent){
-    let numPlayerPasses =0;
-    let numCompPasses = 0;
+    let numPlayerPasses=0;
+    let winner = opponent;
     if (playerLetter === "O"){
-        board = computerMove(board, opponent, numCompPasses);
-
+        console.log("Comupter\'s move first");
+        board = computerMove(board, opponent);
     }
-    //while loop to continually ask for moves
-    while(!rev.isBoardFull(board) && numPlayerPasses < 2 && numCompPasses < 2){
-        let answer = readlineSync.question('What\'s your move? \n>');
+
+    while((board.length > 0) && !rev.isBoardFull(board) && (numPlayerPasses < 2)){
         let possibleMoves = rev.getValidMoves(board, playerLetter);
-        while(!rev.isValidMoveAlgebraicNotation(board, playerLetter, answer) &&  !possibleMoves.isEmpty){
+        if(possibleMoves === []){
+            console.log("You don't have any valid moves");
+            numPlayerPasses++;
+            board = computerMove(board, opponent);
+            //will this happen??
+            if(board.length < 0){
+                break;
+            }
+        }
+        let answer = readlineSync.question('What\'s your move? \n>');
+        //TODO: if pass's exceed 2 in this loop, it doesn't fail while loop..
+        if(answer === "" || answer === " "){ //"pass"
+            console.log("You passed on your turn!");
+            numPlayerPasses++;
+            board = computerMove(board, opponent);
+            continue;
+        }
+        //get valid input
+        while(!rev.isValidMoveAlgebraicNotation(board, playerLetter, answer)){
             console.log("INVALID MOVE. Your move should: \n * be in a  format \n * specify an existing empty cell \n * flip at least one of your oponent's pieces\n");
             answer = readlineSync.question('What\'s your move? \n>');
         }
-        //no possible moves
-        if(possibleMoves.isEmpty){
-            console.log("No valid moves available for you.\n Press <ENTER> to pass.");
-            numPlayerPasses++;
-            board = computerMove(board, opponent, numCompPasses);
-            numCompPasses = numCompPasses; //did computer pass?
-        }
+        let rowColObj = rev.algebraicToRowCol(answer);
         board = rev.placeLetter(board, playerLetter, answer);
+        let cellsToFlip = rev.getCellsToFlip(board, rowColObj.row, rowColObj.col);
+
+        if(cellsToFlip === []){
+            console.log("you have no valid moves :( going to computer's turn.");
+            numPlayerPasses++;
+        }else {
+            board = rev.flipCells(board, cellsToFlip);
+            console.log(rev.boardToString(board));
+            showScore(board);
+        }
+        board = computerMove(board, opponent);
+        if(board === []){
+            winner = playerLetter;
+            continue; //skip to player's turn
+        }
         console.log(rev.boardToString(board));
         showScore(board);
-        readlineSync.question('Press to show computer\'s move...');
-        board = computerMove(board, opponent, numCompPasses);
-        console.log(rev.boardToString(board));
-        showScore(board);
-        numCompPasses = numCompPasses; //did computer pass?
     }
+    if(numPlayerPasses >=2){
+        console.log("You exceeded max passes of 2... \n");
+    }
+    console.log("END OF GAME!! Winner: " + winner);
 }
 
-function computerMove(board, compPiece, passes){
+function computerMove(board, compPiece){
+    readlineSync.question("Press <ENTER> to see computer\'s move");
     let possibleMoves = rev.getValidMoves(board, compPiece);
-    if(possibleMoves.isEmpty){
-        passes++;
+    console.log("possible moves in comp: " + possibleMoves);
+    if(possibleMoves.length === 0){
+        return [];
     }
     const compMove = possibleMoves[Math.floor(Math.random()*possibleMoves.length)];
     const row = compMove[0];
     const col = compMove[1];
     board = rev.setBoardCell(board, compPiece, row, col );
+    let cellsToFlip = rev.getCellsToFlip(board, row, col);
+    board = rev.flipCells(board, cellsToFlip);
+
+    console.log(rev.boardToString(board));
+    showScore(board);
     return board;
 
 }
