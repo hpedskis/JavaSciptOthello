@@ -89,7 +89,8 @@ function setBoardCell(board, letter, row, col){
  Translates algebraic notation specifying a cell into a row and column specifying the same cell.
  If the notation passed in is not valid, then return undefined.
  */
-
+console.log("t1 " + algebraicToRowCol("B3")); // for a 4 x 4 board, {"row": 2, "col": 1}
+console.log("t2 " +algebraicToRowCol("D4")); // for a 4 x 4 board, {"row": 3, "col": 3}
 function algebraicToRowCol(algebraicNotation){
     console.log(algebraicNotation);
     if(algebraicNotation === undefined || algebraicNotation.length !== 2){
@@ -99,24 +100,27 @@ function algebraicToRowCol(algebraicNotation){
     const letters =['A','B','C','D','E','F','G','H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
         'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-    const rowColObj = {
+    let rowColObj = {
         "row": 0,
         "col": 0
     };
-    const res = rowColObj;
+    let res = rowColObj;
 
     const indexInStr = 0;
 
     const letterNumber = /^[0-9a-zA-Z]+$/;
-    if((!algebraicNotation.charAt(indexInStr).match(letterNumber)) || (!algebraicNotation.charAt(indexInStr + 1).match(letterNumber))){
-        return undefined;
+    let currIndex = algebraicNotation[indexInStr];
+    console.log("curr letter at curr index is " + currIndex);
+    if (!currIndex.match(letterNumber) || !(currIndex+1).match(letterNumber)){
+        console.log("a match");
+        return undefined
     }
-
-    const letterIndex = letters.indexOf(algebraicNotation.charAt(indexInStr));
+    //let currIndex2 = algebraicNotation.charAt(indexInStr);
+    const letterIndex = letters.indexOf(currIndex);
     if(letterIndex === -1) {
         return undefined;
     }
-    res.row = (algebraicNotation.charAt(indexInStr + 1) - 1);
+    res.row = (algebraicNotation[indexInStr + 1] - 1);
     res.col = letterIndex;
 
     return res;
@@ -130,6 +134,9 @@ function algebraicToRowCol(algebraicNotation){
 
 function placeLetter(board, letter, algebraicNotation){
     const rowAndColObj = algebraicToRowCol(algebraicNotation);
+    if(rowAndColObj === undefined){
+        return board;
+    }
     board = setBoardCell(board, letter, rowAndColObj.row, rowAndColObj.col);
     return board;
 
@@ -386,6 +393,7 @@ board = placeLetter(board, 'O', "A2");
 console.log(boardToString(board));
 console.log(getCellsToFlip(board, 2, 0, 'X'));
 console.log(isValidMove(board, 'X', 2, 0));
+
 function isValidMove(board, letter, row, col){
     const boardIndex = rowColToIndex(board, row, col);
 
@@ -490,6 +498,7 @@ module.exports = {
     getCellsToFlip: getCellsToFlip,
     isValidMove: isValidMove,
     isValidMoveAlgebraicNotation: isValidMoveAlgebraicNotation,
-    getLetterCounts: getLetterCounts
+    getLetterCounts: getLetterCounts,
+    getValidMoves: getValidMoves
 
 };
