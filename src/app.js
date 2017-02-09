@@ -77,8 +77,8 @@ function setUpCustomBoard(playerLetter){
     }
     const opponent = getOpponentPiece(playerLetter);
     let board = rev.generateBoard(width, width);
-    let middle = (width / 2);
-    let otherMiddle = middle - 1;
+    const middle = (width / 2);
+    const otherMiddle = middle - 1;
 
     board = rev.setBoardCell(board, playerLetter, otherMiddle, middle);
     board = rev.setBoardCell(board, playerLetter, middle, otherMiddle);
@@ -99,7 +99,7 @@ function playGame(board, playerLetter, opponent){
     }
 
     while((board.length > 0) && !rev.isBoardFull(board) && (numPlayerPasses < 2)){
-        let possibleMoves = rev.getValidMoves(board, playerLetter);
+        const possibleMoves = rev.getValidMoves(board, playerLetter);
         if(possibleMoves === []){
             console.log("You don't have any valid moves");
             numPlayerPasses++;
@@ -121,12 +121,18 @@ function playGame(board, playerLetter, opponent){
         while(!rev.isValidMoveAlgebraicNotation(board, playerLetter, answer)){
             console.log("INVALID MOVE. Your move should: \n * be in a  format \n * specify an existing empty cell \n * flip at least one of your oponent's pieces\n");
             answer = readlineSync.question('What\'s your move? \n>');
+            if(answer === "" || answer === " "){ //"pass"
+                console.log("You passed on your turn!");
+                numPlayerPasses++;
+                board = computerMove(board, opponent);
+                continue;
+            }
         }
-        let rowColObj = rev.algebraicToRowCol(answer);
+        const rowColObj = rev.algebraicToRowCol(answer);
         board = rev.placeLetter(board, playerLetter, answer);
-        let cellsToFlip = rev.getCellsToFlip(board, rowColObj.row, rowColObj.col);
+        const cellsToFlip = rev.getCellsToFlip(board, rowColObj.row, rowColObj.col);
 
-        if(cellsToFlip === []){
+        if(cellsToFlip.length < 0){
             console.log("you have no valid moves :( going to computer's turn.");
             numPlayerPasses++;
         }else {
@@ -139,8 +145,7 @@ function playGame(board, playerLetter, opponent){
             winner = playerLetter;
             continue; //skip to player's turn
         }
-        console.log(rev.boardToString(board));
-        showScore(board);
+
     }
     if(numPlayerPasses >=2){
         console.log("You exceeded max passes of 2... \n");
@@ -150,8 +155,8 @@ function playGame(board, playerLetter, opponent){
 
 function computerMove(board, compPiece){
     readlineSync.question("Press <ENTER> to see computer\'s move");
-    let possibleMoves = rev.getValidMoves(board, compPiece);
-    console.log("possible moves in comp: " + possibleMoves);
+    const possibleMoves = rev.getValidMoves(board, compPiece);
+    //console.log("possible moves in comp: " + possibleMoves);
     if(possibleMoves.length === 0){
         return [];
     }
@@ -159,7 +164,7 @@ function computerMove(board, compPiece){
     const row = compMove[0];
     const col = compMove[1];
     board = rev.setBoardCell(board, compPiece, row, col );
-    let cellsToFlip = rev.getCellsToFlip(board, row, col);
+    const cellsToFlip = rev.getCellsToFlip(board, row, col);
     board = rev.flipCells(board, cellsToFlip);
 
     console.log(rev.boardToString(board));

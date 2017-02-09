@@ -100,20 +100,20 @@ function algebraicToRowCol(algebraicNotation){
     const letters =['A','B','C','D','E','F','G','H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
         'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-    let rowColObj = {
+    const rowColObj = {
         "row": 0,
         "col": 0
     };
-    let res = rowColObj;
+    const res = rowColObj;
 
     const indexInStr = 0;
 
     const letterNumber = /^[0-9a-zA-Z]+$/;
-    let currIndex = algebraicNotation[indexInStr];
+    const currIndex = algebraicNotation[indexInStr];
     console.log("curr letter at curr index is " + currIndex);
     if (!currIndex.match(letterNumber) || !(currIndex+1).match(letterNumber)){
         console.log("a match");
-        return undefined
+        return undefined;
     }
     //let currIndex2 = algebraicNotation.charAt(indexInStr);
     const letterIndex = letters.indexOf(currIndex);
@@ -355,29 +355,6 @@ function getCellsToFlip(board, rowStart, colStart){
 
     return tilesToFlip;
 }
-
-function fixGroupings(coordsToFlipArr){
-    let foundSameRowGrouping = [];
-    const newArr = [];
-    for(let i = 0; i< coordsToFlipArr.length - 1; i++){
-        if(coordsToFlipArr[i][0] === coordsToFlipArr[(i+1)][0]){
-            foundSameRowGrouping.push(coordsToFlipArr[i]);
-            foundSameRowGrouping.push(coordsToFlipArr[i+1]);
-            newArr.push(foundSameRowGrouping);
-            foundSameRowGrouping = [];
-            i++;
-
-
-        }else{
-            newArr.push(coordsToFlipArr[i]);
-        }
-
-    }
-    newArr.push(coordsToFlipArr[coordsToFlipArr.length -1]);
-
-    return newArr;
-}
-
 
 
 /*/
